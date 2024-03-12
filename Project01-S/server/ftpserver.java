@@ -9,6 +9,7 @@ import javax.swing.*;
     private Socket connectionSocket;
     int port;
     int count=1;
+    boolean notEnd = true;
 
     public ftpserver(Socket connectionSocket)  {
 	    this.connectionSocket = connectionSocket;
@@ -144,7 +145,32 @@ import javax.swing.*;
 
 
              if(clientCommand.equals("stor:")){
-                System.out.println("hello");
+                String filename = fromClient.substring(11);
+                File file = new File(filename);
+
+                System.out.println("Storing file: " + filename);
+
+                Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+
+                DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+                BufferedReader dataReader = new BufferedReader(new InputStreamReader(inData));
+				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
+				String line;
+
+                while(notEnd)
+					{
+						line = inData.readUTF();
+						if(line.equals("eof"))
+							break;
+					//    System.out.println("  " + modifiedSentence);
+				   
+						fileWriter.write(line);
+					}
+
+                dataSocket.close();
+                dataReader.close();
+                fileWriter.close();
+
              }
 
             if(clientCommand.equals("close")){

@@ -4,7 +4,6 @@ import java.util.*;
 import java.text.*;
 import java.lang.*;
 import javax.swing.*;
-import java.nio.file.*;
 class FTPClient { 
 
     public static void main(String argv[]) throws Exception 
@@ -73,7 +72,7 @@ class FTPClient {
        
 				//Sets up data connection since get uses it
 				port = port +2;
-				System.out.println(port);
+				System.out.println("\nConnected to port: " + port);
 				ServerSocket welcomeData = new ServerSocket(port);
 		
 		
@@ -100,7 +99,6 @@ class FTPClient {
 					//    System.out.println("  " + modifiedSentence);
 				   
 						fileWriter.write(line);
-						//fileWriter.newLine();
 					}
 					System.out.println(" " + filename);
 		
@@ -116,22 +114,45 @@ class FTPClient {
 			
 			else if(sentence.startsWith("stor: "))
 			{
-				//extract filename from command
-				//String filename = tokens.nextToken();
 				String filename = sentence.substring(6);
+				File file = new File(filename);
 
 				// //verify file
-				Path filepath = Paths.get(filename);
-				if(!Files.exists(filepath)){
+				if(!file.exists()){
 				 	System.out.println("File " + filename + " not found\n");
 					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 				}
 
 				port = port +2;
-				System.out.println(port);
+				System.out.println("\nConnected on port: " + port);
 				ServerSocket welcomeData = new ServerSocket(port);
 
+				System.out.println("\n***** Storing file: " + filename + " *****");
+
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
+				Socket dataSocket =welcomeData.accept();
+
+				DataOutputStream  dataOutToClient =
+                new DataOutputStream(dataSocket.getOutputStream());
+				BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
+                BufferedReader fileReader = new BufferedReader(new FileReader(filename));
+                String line;
+
+				while ((line = fileReader.readLine()) != null) {
+                    dataOutToClient.writeUTF(line + "\r\n");
+
+                }
+                dataOutToClient.writeUTF("eof");
+                dataWriter.newLine();
+
+				System.out.println("\n*****Process Complete*****");
+
+				welcomeData.close();
+				dataWriter.close();
+                fileReader.close();
+                dataSocket.close();
+
+				System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 
 			}
 
