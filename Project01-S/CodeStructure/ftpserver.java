@@ -101,15 +101,47 @@ import javax.swing.*;
                 }//if list:
 
 
-            if(clientCommand.equals("get:"))
-            {
-                ....................................
-			    ....................................
-			    ....................................
+            // if(clientCommand.equals("get:"))
+            // {
+            //     ....................................
+			//     ....................................
+			//     ....................................
 
 
 
-             }//main
+            //  } //main
+
+            //  if(clientCommand.equals("stor: ")){
+            //     String filename = tokens.nextToken();
+            //     File file = new File(filenmae);
+
+            //     ServerSocket dataSocket = new ServerSocket(port);
+            //     Socket dataConnection = dataSocket.accoet();
+            //     DataInputStream inFromClient = new DataInputStream(new BufferedInputStream(dataConnection.getInputStream()));
+
+
+            //  }
+
+            if(clientCommand.equals("close")){
+                connectionSocket.close();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            int portNumber = 1235; // Change this to your desired port number
+            ServerSocket serverSocket = new ServerSocket(portNumber);
+            System.out.println("FTP Server is running on port " + portNumber);
+
+            while (true) {
+                Socket connectionSocket = serverSocket.accept();
+                ftpserver server = new ftpserver(connectionSocket);
+                server.start();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not start the server on the specified port.");
+            e.printStackTrace();
         }
     }
 }

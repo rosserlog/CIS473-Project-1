@@ -4,6 +4,7 @@ import java.util.*;
 import java.text.*;
 import java.lang.*;
 import javax.swing.*;
+import java.nio.file.*;
 class FTPClient { 
 
     public static void main(String argv[]) throws Exception 
@@ -64,23 +65,55 @@ class FTPClient {
 			System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 
 			}
-			else if(sentence.startsWith("get: "))
+
+			// else if(sentence.startsWith("get: "))
+			// {
+			// .........................................................
+			// .........................................................
+			// .........................................................
+			// }
+			
+			else if(sentence.startsWith("stor: "))
 			{
-			.........................................................
-			.........................................................
-			.........................................................
+				//extract filename from command
+				//String filename = tokens.nextToken();
+				String filename = sentence.substring(6);
+				System.out.println(filename);
+
+
+
+				// //verify file
+				Path filepath = Paths.get(filename);
+				if(!Files.exists(filepath)){
+				 	System.out.println("File not found");
+				 	break;
+				}
+				else{
+					System.out.println("THIS IS A FILE!");
+				}
+
+				// //open socket and outputstream
+				// Socket dataSocket = new Socket(serverName, port1 + 1);
+				// DataOutputStream outData = new DataOutputStream(dataSocket.getOutputStream());
+
+				// //send server port, stor command, and filename
+				// outToServer.writeBytes(port + " " + sentence + " " + '\n');
+
+				// //Send file over line by line
+				
 
 			}
 
-		}
+			else{
+				if(sentence.equals("close"))
+				{
+					outToServer.writeBytes (port + " " + sentence + " " + '\n');
+				    ControlSocket.close();
+				}
+				break;
+			}	
+
+		}			  
 	}
-	else{
-	     if(sentence.equals("close"))
-	     {
-		clientgo = false;
-	     }
-	     System.out.print("No server exists with that name or server not listening on that port try agian");
-                   
-    } 
   }
 }
