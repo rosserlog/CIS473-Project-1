@@ -66,12 +66,53 @@ class FTPClient {
 
 			}
 
-			// else if(sentence.startsWith("get: "))
-			// {
-			// .........................................................
-			// .........................................................
-			// .........................................................
-			// }
+			else if(sentence.startsWith("get: "))
+			{
+				//supposed to get file name
+				String filename = sentence.substring(4).trim();
+       
+				//Sets up data connection since get uses it
+				port = port +2;
+				System.out.println(port);
+				ServerSocket welcomeData = new ServerSocket(port);
+		
+		
+				System.out.println("\n \n \nThe data connection for get has been created:");
+			   
+				//send the request over the control connection outToServer/inToServer = control connection
+				System.out.println("\n \n \nRequested File is:");
+				outToServer.writeBytes (port + " " + sentence + " " + '\n');
+		
+		
+				Socket dataSocket =welcomeData.accept();
+				DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+			   
+				BufferedReader dataReader = new BufferedReader(new InputStreamReader(inData));
+				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
+				String line;
+		
+		
+					while(notEnd)
+					{
+						line = dataReader.readLine();
+						if(line.equals("eof"))
+							break;
+					//    System.out.println("  " + modifiedSentence);
+				   
+						fileWriter.write(line);
+						fileWriter.newLine();
+					}
+					System.out.println(" " + filename);
+		
+		
+			 welcomeData.close();
+			 dataSocket.close();
+			 dataReader.close();
+			 fileWriter.close();
+			 
+			 System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+		
+			}
 			
 			else if(sentence.startsWith("stor: "))
 			{
