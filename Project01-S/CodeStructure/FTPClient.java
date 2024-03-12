@@ -94,13 +94,13 @@ class FTPClient {
 		
 					while(notEnd)
 					{
-						line = dataReader.readLine();
+						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
 					//    System.out.println("  " + modifiedSentence);
 				   
 						fileWriter.write(line);
-						fileWriter.newLine();
+						//fileWriter.newLine();
 					}
 					System.out.println(" " + filename);
 		
@@ -119,29 +119,19 @@ class FTPClient {
 				//extract filename from command
 				//String filename = tokens.nextToken();
 				String filename = sentence.substring(6);
-				System.out.println(filename);
-
-
 
 				// //verify file
 				Path filepath = Paths.get(filename);
 				if(!Files.exists(filepath)){
-				 	System.out.println("File not found");
-				 	break;
-				}
-				else{
-					System.out.println("THIS IS A FILE!");
+				 	System.out.println("File " + filename + " not found\n");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 				}
 
-				// //open socket and outputstream
-				// Socket dataSocket = new Socket(serverName, port1 + 1);
-				// DataOutputStream outData = new DataOutputStream(dataSocket.getOutputStream());
+				port = port +2;
+				System.out.println(port);
+				ServerSocket welcomeData = new ServerSocket(port);
 
-				// //send server port, stor command, and filename
-				// outToServer.writeBytes(port + " " + sentence + " " + '\n');
-
-				// //Send file over line by line
-				
+				outToServer.writeBytes (port + " " + sentence + " " + '\n');
 
 			}
 
