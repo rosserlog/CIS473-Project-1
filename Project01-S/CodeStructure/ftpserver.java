@@ -6,26 +6,28 @@ import java.lang.*;
 import javax.swing.*;
 
     public class ftpserver extends Thread{ 
-      private Socket connectionSocket;
-      int port;
-      int count=1;
+    private Socket connectionSocket;
+    int port;
+    int count=1;
+
     public ftpserver(Socket connectionSocket)  {
-	this.connectionSocket = connectionSocket;
+	    this.connectionSocket = connectionSocket;
     }
 
 
-      public void run() 
-        {
-                if(count==1)
-                    System.out.println("User connected" + connectionSocket.getInetAddress());
-                count++;
+    public void run() 
+    {
+        if(count==1){
+            System.out.println("User connected" + connectionSocket.getInetAddress());
+            count++;
+        }
 
-	try {
-		processRequest();
+	    try {
+		    processRequest();
 		
-	} catch (Exception e) {
-		System.out.println(e);
-	}
+	    } catch (Exception e) {
+		    System.out.println(e);
+	    }
 	 
 	}
 	
@@ -47,66 +49,69 @@ import javax.swing.*;
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 fromClient = inFromClient.readLine();
             
-      		//System.out.println(fromClient);
-                  StringTokenizer tokens = new StringTokenizer(fromClient);
+      		    //System.out.println(fromClient);
+                StringTokenizer tokens = new StringTokenizer(fromClient);
             
-                  frstln = tokens.nextToken();
-                  port = Integer.parseInt(frstln);
-                  clientCommand = tokens.nextToken();
-                  //System.out.println(clientCommand);
+                frstln = tokens.nextToken();
+                port = Integer.parseInt(frstln);
+                clientCommand = tokens.nextToken();
+                //System.out.println(clientCommand);
 
 
-                  if(clientCommand.equals("list:"))
-                  { 
-                      String curDir = System.getProperty("user.dir");
+                if(clientCommand.equals("list:"))
+                { 
+                    String curDir = System.getProperty("user.dir");
        
-                      Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
-                      DataOutputStream  dataOutToClient = 
-                      new DataOutputStream(dataSocket.getOutputStream());
-                      File dir = new File(curDir);
+                    Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+                    DataOutputStream  dataOutToClient = 
+                    new DataOutputStream(dataSocket.getOutputStream());
+                    File dir = new File(curDir);
     
-                      String[] children = dir.list();
-                      if (children == null) 
-                      {
-                          // Either dir does not exist or is not a directory
-                      } 
-                      else 
-                      {
-                          for (int i=0; i<children.length; i++)
-                          {
-                              // Get filename of file or directory
-                              String filename = children[i];
+                    String[] children = dir.list();
+                    if (children == null) 
+                    {
+                        // Either dir does not exist or is not a directory
+                    } 
+                    else 
+                    {
+                        for (int i=0; i<children.length; i++)
+                        {
+                           // Get filename of file or directory
+                            String filename = children[i];
 
-                              if(filename.endsWith(".txt"))
+                            if(filename.endsWith(".txt"))
+                            {
                                 dataOutToClient.writeUTF(children[i]);
-                             //System.out.println(filename);
-                             if(i-1==children.length-2)
-                             {
-                                 dataOutToClient.writeUTF("eof");
-                                 // System.out.println("eof");
-                             }//if(i-1)
+                            }  
+                            //System.out.println(filename);
+                            if(i-1==children.length-2)
+                            {
+                                dataOutToClient.writeUTF("eof");
+                                // System.out.println("eof");
+                            }//if(i-1)
 
      
                           }//for
 
-                           dataSocket.close();
-		          //System.out.println("Data Socket closed");
-                     }//else
+                        dataSocket.close();
+		            //System.out.println("Data Socket closed");
+                    }//else
         
 
                 }//if list:
 
 
-                if(clientCommand.equals("get:"))
-                {
-                        ....................................
-			....................................
-			....................................
+            if(clientCommand.equals("get:"))
+            {
+                ....................................
+			    ....................................
+			    ....................................
 
 
 
-            }//main
+             }//main
         }
+    }
 }
 	
 
