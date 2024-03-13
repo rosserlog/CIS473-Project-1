@@ -106,16 +106,18 @@ import javax.swing.*;
             {
                 String filename = fromClient.substring(10).trim();
                 //String filename = tokens.nextToken();
-                System.out.println("***** Client requested file: " + filename + " *****");
+                System.out.println("Client requested file: " + filename);
     
     
                 File file = new File(filename);
-                   
                 //Check if the file exists send correct satus code
                 if (!file.exists()) {
-                    outToClient.writeBytes("** File " + filename + " not found **\r\n");
+                    outToClient.writeUTF("F");
+                    System.out.println("File not found");
+                    
                 } 
-                else {
+                else { 
+                    outToClient.writeUTF("T");  
                     Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
                     DataOutputStream  dataOutToClient =
                     new DataOutputStream(dataSocket.getOutputStream());
@@ -128,12 +130,12 @@ import javax.swing.*;
         
                     while ((line = fileReader.readLine()) != null) {
                         dataOutToClient.writeUTF(line + "\r\n");
-    
+
                     }
                     dataOutToClient.writeUTF("eof");
                     dataWriter.newLine();
-                       
-                     //close socket
+                    
+                    //close socket
                     dataWriter.close();
                     fileReader.close();
                     dataSocket.close();

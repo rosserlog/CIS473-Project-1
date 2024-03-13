@@ -68,31 +68,32 @@ class FTPClient {
 			{
 				//supposed to get file name
 				String filename = sentence.substring(4).trim();
-       
+
 				//Sets up data connection since get uses it
+				System.out.println("\n \n \nThe data connection for get has been created:");
+			   
+				//send the request over the control connection outToServer/inToServer = control connection
+				System.out.println("\n \n \nRequested File is:");
+				System.out.println("Hello");
 				port = port +2;
 				ServerSocket welcomeData = new ServerSocket(port);
-
-				//send the request over the control connection outToServer/inToServer = control connection
-				System.out.println("\n \nRequested File is:");
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
-		
-		
-				Socket dataSocket =welcomeData.accept();
-				DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-				BufferedReader dataReader = new BufferedReader(new InputStreamReader(inData));
-				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
-				String line;
 
-				//Attempting to read file not found message
-				String message = dataReader.readLine();
-				//if file not found re give prompt
-				if(message.startsWith("** File")){
-					System.out.println("\n ***** File " + filename + " not found *****");
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+				
+				String error = inFromServer.readUTF();
+				if(error.equals("F")){
+					System.out.println("File not existing");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+					welcomeData.close();
 				}
-				//if not error message continue as normal
 				else{
+					Socket dataSocket =welcomeData.accept();
+					DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+				
+					BufferedReader dataReader = new BufferedReader(new InputStreamReader(inData));
+					BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
+					String line;
+		
 					while(notEnd)
 					{
 						line = inData.readUTF();
@@ -101,6 +102,7 @@ class FTPClient {
 					//    System.out.println("  " + modifiedSentence);
 				   
 						fileWriter.write(line);
+						//fileWriter.newLine();
 					}
 					System.out.println(" " + filename);
 		
@@ -110,11 +112,9 @@ class FTPClient {
 					dataReader.close();
 					fileWriter.close();
 					
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
-		
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 				}
 		
-	
 			}
 			
 			else if(sentence.startsWith("stor: "))
