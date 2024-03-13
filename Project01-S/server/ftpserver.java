@@ -106,40 +106,38 @@ import javax.swing.*;
             {
                 String filename = fromClient.substring(10).trim();
                 //String filename = tokens.nextToken();
-                System.out.println("Client requested file: " + filename);
+                System.out.println("***** Client requested file: " + filename + " *****");
     
     
                 File file = new File(filename);
                    
                 //Check if the file exists send correct satus code
                 if (!file.exists()) {
-                    outToClient.writeBytes("550 File not found\r\n");
-                } else {
-                    outToClient.writeBytes("200 Command Ok\r\n");
+                    outToClient.writeBytes("** File " + filename + " not found **\r\n");
+                } 
+                else {
+                    Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+                    DataOutputStream  dataOutToClient =
+                    new DataOutputStream(dataSocket.getOutputStream());
+        
+                    //might need to use scanner idk gotta read file handling pdf.
+                    BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
+                    BufferedReader fileReader = new BufferedReader(new FileReader(file));
+                    String line;
+        
+        
+                    while ((line = fileReader.readLine()) != null) {
+                        dataOutToClient.writeUTF(line + "\r\n");
+    
+                    }
+                    dataOutToClient.writeUTF("eof");
+                    dataWriter.newLine();
+                       
+                     //close socket
+                    dataWriter.close();
+                    fileReader.close();
+                    dataSocket.close();
                 }
-    
-    
-                Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
-                DataOutputStream  dataOutToClient =
-                new DataOutputStream(dataSocket.getOutputStream());
-    
-                //might need to use scanner idk gotta read file handling pdf.
-                BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
-                BufferedReader fileReader = new BufferedReader(new FileReader(file));
-                String line;
-    
-    
-                while ((line = fileReader.readLine()) != null) {
-                    dataOutToClient.writeUTF(line + "\r\n");
-
-                }
-                dataOutToClient.writeUTF("eof");
-                dataWriter.newLine();
-                   
-                 //close socket
-                dataWriter.close();
-                fileReader.close();
-                dataSocket.close();
 
             }
 
@@ -148,7 +146,7 @@ import javax.swing.*;
                 String filename = fromClient.substring(11);
                 File file = new File(filename);
 
-                System.out.println("Storing file: " + filename);
+                System.out.println("***** Storing file: " + filename + " *****");
 
                 Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
 
@@ -183,7 +181,7 @@ import javax.swing.*;
         try {
             int portNumber = 1235; // Change this to your desired port number
             ServerSocket serverSocket = new ServerSocket(portNumber);
-            System.out.println("FTP Server is running on port " + portNumber);
+            System.out.println("***** FTP Server is running on port " + portNumber + " *****");
 
             while (true) {
                 Socket connectionSocket = serverSocket.accept();
@@ -191,7 +189,7 @@ import javax.swing.*;
                 server.start();
             }
         } catch (IOException e) {
-            System.err.println("Could not start the server on the specified port.");
+            System.err.println("***** Could not start the server on the specified port. *****");
             e.printStackTrace();
         }
     }

@@ -18,7 +18,7 @@ class FTPClient {
 		String statusCode;
 		boolean clientgo = true;
 	    
-	System.out.println("Welcome to the simple FTP App   \n     Commands  \nconnect servername port# connects to a specified server \nlist: lists files on server \nget: fileName.txt downloads that text file to your current directory \nstor: fileName.txt Stores the file on the server \nclose terminates the connection to the server");
+	System.out.println("\nWelcome to the simple FTP App   \n\n*****Commands*****  \nconnect servername port# connects to a specified server \nlist: lists files on server \nget: fileName.txt downloads that text file to your current directory \nstor: fileName.txt Stores the file on the server \nclose terminates the connection to the server\n");
 	BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in)); 
     sentence = inFromUser.readLine();
     StringTokenizer tokens = new StringTokenizer(sentence);
@@ -28,7 +28,7 @@ class FTPClient {
 		String serverName = tokens.nextToken(); // pass the connect command
 		serverName = tokens.nextToken();
 		port1 = Integer.parseInt(tokens.nextToken());
-		System.out.println("You are connected to " + serverName);
+		System.out.println("\n***** You are connected to " + serverName + " *****\n");
 		Socket ControlSocket= new Socket(serverName, port1);
 		while(isOpen && clientgo)
 		{      
@@ -42,11 +42,10 @@ class FTPClient {
 			{
 				
 			port = port +2;
-			System.out.println(port);
 			ServerSocket welcomeData = new ServerSocket(port);
 
+			System.out.println("\n \nThe files on this server are: " );
 
-			System.out.println("\n \n \nThe files on this server are:");
 			outToServer.writeBytes (port + " " + sentence + " " + '\n');
 
 			Socket dataSocket =welcomeData.accept(); 
@@ -61,7 +60,7 @@ class FTPClient {
 
 			welcomeData.close();
 			dataSocket.close();
-			System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+			System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 
 			}
 
@@ -72,25 +71,28 @@ class FTPClient {
        
 				//Sets up data connection since get uses it
 				port = port +2;
-				System.out.println("\nConnected to port: " + port);
 				ServerSocket welcomeData = new ServerSocket(port);
-		
-		
-				System.out.println("\n \n \nThe data connection for get has been created:");
-			   
+
 				//send the request over the control connection outToServer/inToServer = control connection
-				System.out.println("\n \n \nRequested File is:");
+				System.out.println("\n \nRequested File is:");
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
 		
 		
 				Socket dataSocket =welcomeData.accept();
 				DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-			   
 				BufferedReader dataReader = new BufferedReader(new InputStreamReader(inData));
 				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
 				String line;
-		
-		
+
+				//Attempting to read file not found message
+				String message = dataReader.readLine();
+				//if file not found re give prompt
+				if(message.startsWith("** File")){
+					System.out.println("\n ***** File " + filename + " not found *****");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+				}
+				//if not error message continue as normal
+				else{
 					while(notEnd)
 					{
 						line = inData.readUTF();
@@ -103,13 +105,16 @@ class FTPClient {
 					System.out.println(" " + filename);
 		
 		
-			 welcomeData.close();
-			 dataSocket.close();
-			 dataReader.close();
-			 fileWriter.close();
-			 
-			 System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+					welcomeData.close();
+					dataSocket.close();
+					dataReader.close();
+					fileWriter.close();
+					
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 		
+				}
+		
+	
 			}
 			
 			else if(sentence.startsWith("stor: "))
@@ -119,40 +124,41 @@ class FTPClient {
 
 				// //verify file
 				if(!file.exists()){
-				 	System.out.println("File " + filename + " not found\n");
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+				 	System.out.println("***** File " + filename + " not found *****");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+				}				
+				else{
+					port = port +2;
+					ServerSocket welcomeData = new ServerSocket(port);
+	
+					System.out.println("\nStoring file: " + filename);
+	
+					outToServer.writeBytes (port + " " + sentence + " " + '\n');
+					Socket dataSocket =welcomeData.accept();
+	
+					DataOutputStream  dataOutToClient =
+					new DataOutputStream(dataSocket.getOutputStream());
+					BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
+					BufferedReader fileReader = new BufferedReader(new FileReader(filename));
+					String line;
+	
+					while ((line = fileReader.readLine()) != null) {
+						dataOutToClient.writeUTF(line + "\r\n");
+	
+					}
+					dataOutToClient.writeUTF("eof");
+					dataWriter.newLine();
+	
+					System.out.println("\n*****Process Complete*****");
+	
+					welcomeData.close();
+					dataWriter.close();
+					fileReader.close();
+					dataSocket.close();
+	
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 				}
 
-				port = port +2;
-				System.out.println("\nConnected on port: " + port);
-				ServerSocket welcomeData = new ServerSocket(port);
-
-				System.out.println("\n***** Storing file: " + filename + " *****");
-
-				outToServer.writeBytes (port + " " + sentence + " " + '\n');
-				Socket dataSocket =welcomeData.accept();
-
-				DataOutputStream  dataOutToClient =
-                new DataOutputStream(dataSocket.getOutputStream());
-				BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
-                BufferedReader fileReader = new BufferedReader(new FileReader(filename));
-                String line;
-
-				while ((line = fileReader.readLine()) != null) {
-                    dataOutToClient.writeUTF(line + "\r\n");
-
-                }
-                dataOutToClient.writeUTF("eof");
-                dataWriter.newLine();
-
-				System.out.println("\n*****Process Complete*****");
-
-				welcomeData.close();
-				dataWriter.close();
-                fileReader.close();
-                dataSocket.close();
-
-				System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
 
 			}
 
