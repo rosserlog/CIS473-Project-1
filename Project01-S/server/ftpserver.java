@@ -49,12 +49,15 @@ import javax.swing.*;
                 DataOutputStream  outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 fromClient = inFromClient.readLine();
-
+            
+      		    //System.out.println(fromClient);
                 StringTokenizer tokens = new StringTokenizer(fromClient);
             
                 frstln = tokens.nextToken();
                 port = Integer.parseInt(frstln);
                 clientCommand = tokens.nextToken();
+                //System.out.println(clientCommand);
+
 
                 if(clientCommand.equals("list:"))
                 { 
@@ -81,49 +84,58 @@ import javax.swing.*;
                             {
                                 dataOutToClient.writeUTF(children[i]);
                             }  
+                            //System.out.println(filename);
                             if(i-1==children.length-2)
                             {
                                 dataOutToClient.writeUTF("eof");
-                            }   
-                          }
+                                // System.out.println("eof");
+                            }//if(i-1)
+
+     
+                          }//for
 
                         dataSocket.close();
-                    }
-                }
+		            //System.out.println("Data Socket closed");
+                    }//else
+        
+
+                }//if list:
 
 
-            if(clientCommand.equals("get:"))
+            if(clientCommand.equals("retr:"))
             {
                 String filename = fromClient.substring(10).trim();
+                //String filename = tokens.nextToken();
                 System.out.println("Client requested file: " + filename);
+    
+    
                 File file = new File(filename);
-
-                //If file doe not exist do not continue
+                //Check if the file exists send correct satus code
                 if (!file.exists()) {
-                    outToClient.writeUTF("F");
+                    outToClient.writeUTF("550");
                     System.out.println("File not found");
                     
                 } 
-                //If file exists continue to send over file
                 else { 
-                    outToClient.writeUTF("T");  
-
+                    outToClient.writeUTF("200");  
                     Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
                     DataOutputStream  dataOutToClient =
                     new DataOutputStream(dataSocket.getOutputStream());
-
+        
+                    //might need to use scanner idk gotta read file handling pdf.
                     BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
                     BufferedReader fileReader = new BufferedReader(new FileReader(file));
                     String line;
         
+        
                     while ((line = fileReader.readLine()) != null) {
                         dataOutToClient.writeUTF(line + "\r\n");
-                    }
 
+                    }
                     dataOutToClient.writeUTF("eof");
                     dataWriter.newLine();
                     
-                    //close sockets
+                    //close socket
                     dataWriter.close();
                     fileReader.close();
                     dataSocket.close();
@@ -135,6 +147,7 @@ import javax.swing.*;
              if(clientCommand.equals("stor:")){
                 String filename = fromClient.substring(11);
                 File file = new File(filename);
+
                 System.out.println("***** Storing file: " + filename + " *****");
 
                 Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
@@ -149,17 +162,18 @@ import javax.swing.*;
 						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
-
+					//    System.out.println("  " + modifiedSentence);
+				   
 						fileWriter.write(line);
 					}
 
                 dataSocket.close();
                 dataReader.close();
                 fileWriter.close();
+
              }
 
-
-            if(clientCommand.equals("close")){
+            if(clientCommand.equals("quit")){
                 connectionSocket.close();
             }
         }
