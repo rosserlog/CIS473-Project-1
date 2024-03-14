@@ -84,28 +84,19 @@ import javax.swing.*;
                             {
                                 dataOutToClient.writeUTF(children[i]);
                             }  
-                            //System.out.println(filename);
                             if(i-1==children.length-2)
                             {
                                 dataOutToClient.writeUTF("eof");
-                                // System.out.println("eof");
-                            }//if(i-1)
-
-     
-                          }//for
+                            }
+                          }
 
                         dataSocket.close();
-		            //System.out.println("Data Socket closed");
-                    }//else
-        
-
-                }//if list:
-
+                    }
+                }
 
             if(clientCommand.equals("retr:"))
             {
                 String filename = fromClient.substring(10).trim();
-                //String filename = tokens.nextToken();
                 System.out.println("Client requested file: " + filename);
     
     
@@ -162,7 +153,6 @@ import javax.swing.*;
 						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
-					//    System.out.println("  " + modifiedSentence);
 				   
 						fileWriter.write(line);
 					}
