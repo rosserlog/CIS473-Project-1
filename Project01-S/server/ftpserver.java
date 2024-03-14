@@ -102,7 +102,7 @@ import javax.swing.*;
                 }//if list:
 
 
-            if(clientCommand.equals("get:"))
+            if(clientCommand.equals("retr:"))
             {
                 String filename = fromClient.substring(10).trim();
                 //String filename = tokens.nextToken();
@@ -112,12 +112,12 @@ import javax.swing.*;
                 File file = new File(filename);
                 //Check if the file exists send correct satus code
                 if (!file.exists()) {
-                    outToClient.writeUTF("F");
+                    outToClient.writeUTF("550");
                     System.out.println("File not found");
                     
                 } 
                 else { 
-                    outToClient.writeUTF("T");  
+                    outToClient.writeUTF("200");  
                     Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
                     DataOutputStream  dataOutToClient =
                     new DataOutputStream(dataSocket.getOutputStream());
@@ -173,7 +173,7 @@ import javax.swing.*;
 
              }
 
-            if(clientCommand.equals("close")){
+            if(clientCommand.equals("quit")){
                 connectionSocket.close();
             }
         }
@@ -181,7 +181,7 @@ import javax.swing.*;
 
     public static void main(String[] args) {
         try {
-            int portNumber = 1235; // Change this to your desired port number
+            int portNumber = 1235; 
             ServerSocket serverSocket = new ServerSocket(portNumber);
             System.out.println("***** FTP Server is running on port " + portNumber + " *****");
 

@@ -18,7 +18,7 @@ class FTPClient {
 		String statusCode;
 		boolean clientgo = true;
 	    
-	System.out.println("\nWelcome to the simple FTP App   \n\n*****Commands*****  \nconnect servername port# connects to a specified server \nlist: lists files on server \nget: fileName.txt downloads that text file to your current directory \nstor: fileName.txt Stores the file on the server \nclose terminates the connection to the server\n");
+	System.out.println("\nWelcome to the simple FTP App   \n\n*****Commands*****  \nconnect servername port# connects to a specified server \nlist: lists files on server \nretr: fileName.txt downloads that text file to your current directory \nstor: fileName.txt Stores the file on the server \nquit terminates the connection to the server\n");
 	BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in)); 
     sentence = inFromUser.readLine();
     StringTokenizer tokens = new StringTokenizer(sentence);
@@ -60,30 +60,29 @@ class FTPClient {
 
 			welcomeData.close();
 			dataSocket.close();
-			System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+			System.out.println("\nWhat would you like to do next: \nretr: file.txt ||  stor: file.txt  || quit\n");
 
 			}
 
-			else if(sentence.startsWith("get: "))
+			else if(sentence.startsWith("retr: "))
 			{
 				//supposed to get file name
-				String filename = sentence.substring(4).trim();
+				String filename = sentence.substring(5).trim();
 
 				//Sets up data connection since get uses it
 				System.out.println("\n \n \nThe data connection for get has been created:");
 			   
 				//send the request over the control connection outToServer/inToServer = control connection
 				System.out.println("\n \n \nRequested File is:");
-				System.out.println("Hello");
 				port = port +2;
 				ServerSocket welcomeData = new ServerSocket(port);
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
 
 				
 				String error = inFromServer.readUTF();
-				if(error.equals("F")){
-					System.out.println("File not existing");
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+				if(error.equals("550")){
+					System.out.println("File does not exist");
+					System.out.println("\nWhat would you like to do next: \nretr: file.txt ||  stor: file.txt  || quit");
 					welcomeData.close();
 				}
 				else{
@@ -112,7 +111,7 @@ class FTPClient {
 					dataReader.close();
 					fileWriter.close();
 					
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+					System.out.println("\nWhat would you like to do next: \nretr: file.txt ||  stor: file.txt  || quit");
 				}
 		
 			}
@@ -125,7 +124,7 @@ class FTPClient {
 				// //verify file
 				if(!file.exists()){
 				 	System.out.println("***** File " + filename + " not found *****");
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+					System.out.println("\nWhat would you like to do next: \nretr: file.txt ||  stor: file.txt  || quit\n");
 				}				
 				else{
 					port = port +2;
@@ -156,14 +155,14 @@ class FTPClient {
 					fileReader.close();
 					dataSocket.close();
 	
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || quit\n");
 				}
 
 
 			}
 
 			else{
-				if(sentence.equals("close"))
+				if(sentence.equals("quit"))
 				{
 					outToServer.writeBytes (port + " " + sentence + " " + '\n');
 				    ControlSocket.close();
