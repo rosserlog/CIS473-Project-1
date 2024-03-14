@@ -49,15 +49,12 @@ import javax.swing.*;
                 DataOutputStream  outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 fromClient = inFromClient.readLine();
-            
-      		    //System.out.println(fromClient);
+
                 StringTokenizer tokens = new StringTokenizer(fromClient);
             
                 frstln = tokens.nextToken();
                 port = Integer.parseInt(frstln);
                 clientCommand = tokens.nextToken();
-                //System.out.println(clientCommand);
-
 
                 if(clientCommand.equals("list:"))
                 { 
@@ -84,58 +81,49 @@ import javax.swing.*;
                             {
                                 dataOutToClient.writeUTF(children[i]);
                             }  
-                            //System.out.println(filename);
                             if(i-1==children.length-2)
                             {
                                 dataOutToClient.writeUTF("eof");
-                                // System.out.println("eof");
-                            }//if(i-1)
-
-     
-                          }//for
+                            }   
+                          }
 
                         dataSocket.close();
-		            //System.out.println("Data Socket closed");
-                    }//else
-        
-
-                }//if list:
+                    }
+                }
 
 
             if(clientCommand.equals("get:"))
             {
                 String filename = fromClient.substring(10).trim();
-                //String filename = tokens.nextToken();
                 System.out.println("Client requested file: " + filename);
-    
-    
                 File file = new File(filename);
-                //Check if the file exists send correct satus code
+
+                //If file doe not exist do not continue
                 if (!file.exists()) {
                     outToClient.writeUTF("F");
                     System.out.println("File not found");
                     
                 } 
+                //If file exists continue to send over file
                 else { 
                     outToClient.writeUTF("T");  
+
                     Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
                     DataOutputStream  dataOutToClient =
                     new DataOutputStream(dataSocket.getOutputStream());
-        
-                    //might need to use scanner idk gotta read file handling pdf.
+
                     BufferedWriter dataWriter = new BufferedWriter(new OutputStreamWriter(dataOutToClient));
                     BufferedReader fileReader = new BufferedReader(new FileReader(file));
                     String line;
         
-        
                     while ((line = fileReader.readLine()) != null) {
                         dataOutToClient.writeUTF(line + "\r\n");
-
                     }
+
                     dataOutToClient.writeUTF("eof");
                     dataWriter.newLine();
                     
-                    //close socket
+                    //close sockets
                     dataWriter.close();
                     fileReader.close();
                     dataSocket.close();
@@ -147,7 +135,6 @@ import javax.swing.*;
              if(clientCommand.equals("stor:")){
                 String filename = fromClient.substring(11);
                 File file = new File(filename);
-
                 System.out.println("***** Storing file: " + filename + " *****");
 
                 Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
@@ -162,16 +149,15 @@ import javax.swing.*;
 						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
-					//    System.out.println("  " + modifiedSentence);
-				   
+
 						fileWriter.write(line);
 					}
 
                 dataSocket.close();
                 dataReader.close();
                 fileWriter.close();
-
              }
+
 
             if(clientCommand.equals("close")){
                 connectionSocket.close();
@@ -181,7 +167,7 @@ import javax.swing.*;
 
     public static void main(String[] args) {
         try {
-            int portNumber = 1235; // Change this to your desired port number
+            int portNumber = 1235; 
             ServerSocket serverSocket = new ServerSocket(portNumber);
             System.out.println("***** FTP Server is running on port " + portNumber + " *****");
 

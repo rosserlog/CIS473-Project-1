@@ -66,26 +66,22 @@ class FTPClient {
 
 			else if(sentence.startsWith("get: "))
 			{
-				//supposed to get file name
 				String filename = sentence.substring(4).trim();
+				System.out.println("\n \nRequested File is:");
 
-				//Sets up data connection since get uses it
-				System.out.println("\n \n \nThe data connection for get has been created:");
-			   
-				//send the request over the control connection outToServer/inToServer = control connection
-				System.out.println("\n \n \nRequested File is:");
-				System.out.println("Hello");
 				port = port +2;
 				ServerSocket welcomeData = new ServerSocket(port);
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
 
-				
-				String error = inFromServer.readUTF();
+				String error = inFromServer.readUTF(); //Read message from server for if file exists
+				//If file does not exist stop 
 				if(error.equals("F")){
-					System.out.println("File not existing");
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+					System.out.println("***** Unable to get file *****");
+					System.out.println("***** File " + filename + " not found on server *****");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 					welcomeData.close();
 				}
+				//If file exists continue to get file
 				else{
 					Socket dataSocket =welcomeData.accept();
 					DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
@@ -99,20 +95,18 @@ class FTPClient {
 						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
-					//    System.out.println("  " + modifiedSentence);
-				   
+
 						fileWriter.write(line);
-						//fileWriter.newLine();
 					}
 					System.out.println(" " + filename);
-		
+					System.out.println("\n\n***** Process Complete *****");
 		
 					welcomeData.close();
 					dataSocket.close();
 					dataReader.close();
 					fileWriter.close();
 					
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close");
+					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 				}
 		
 			}
@@ -122,11 +116,13 @@ class FTPClient {
 				String filename = sentence.substring(6);
 				File file = new File(filename);
 
-				// //verify file
+				//If file doe not exist stop
 				if(!file.exists()){
+					System.out.println("\n\n***** Unable to store file *****");
 				 	System.out.println("***** File " + filename + " not found *****");
 					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
-				}				
+				}	
+				//If file exists send file to server			
 				else{
 					port = port +2;
 					ServerSocket welcomeData = new ServerSocket(port);
@@ -158,8 +154,6 @@ class FTPClient {
 	
 					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || close\n");
 				}
-
-
 			}
 
 			else{
@@ -170,7 +164,6 @@ class FTPClient {
 				}
 				break;
 			}	
-
 		}			  
 	}
   }
