@@ -1,21 +1,16 @@
 import java.io.*; 
 import java.net.*;
 import java.util.*;
-import java.text.*;
-import java.lang.*;
-import javax.swing.*;
-class FTPClient { 
 
+class FTPClient { 
     public static void main(String argv[]) throws Exception 
     { 
         String sentence; 
         String modifiedSentence; 
         boolean isOpen = true;
-        int number=1;
         boolean notEnd = true;
 		int port1=1221;
 		int port = 1200;
-		String statusCode;
 		boolean clientgo = true;
 	    
 	System.out.println("\nWelcome to the simple FTP App   \n\n*****Commands*****  \nconnect servername port# connects to a specified server \nlist: lists files on server \nretr: fileName.txt downloads that text file to your current directory \nstor: fileName.txt Stores the file on the server \nquit terminates the connection to the server\n");
@@ -68,12 +63,9 @@ class FTPClient {
 			{
 				//supposed to get file name
 				String filename = sentence.substring(5).trim();
-
-				//Sets up data connection since get uses it
-				System.out.println("\n \n \nThe data connection for get has been created:");
 			   
 				//send the request over the control connection outToServer/inToServer = control connection
-				System.out.println("\n \n \nRequested File is:");
+				System.out.println("\n \n Requested File is:");
 				port = port +2;
 				ServerSocket welcomeData = new ServerSocket(port);
 				outToServer.writeBytes (port + " " + sentence + " " + '\n');
@@ -98,10 +90,8 @@ class FTPClient {
 						line = inData.readUTF();
 						if(line.equals("eof"))
 							break;
-					//    System.out.println("  " + modifiedSentence);
 				   
 						fileWriter.write(line);
-						//fileWriter.newLine();
 					}
 					System.out.println(" " + filename);
 		
@@ -123,7 +113,7 @@ class FTPClient {
 
 				// //verify file
 				if(!file.exists()){
-				 	System.out.println("***** File " + filename + " not found *****");
+				 	System.out.println("\nFile " + filename + " not found");
 					System.out.println("\nWhat would you like to do next: \nretr: file.txt ||  stor: file.txt  || quit\n");
 				}				
 				else{
@@ -148,17 +138,13 @@ class FTPClient {
 					dataOutToClient.writeUTF("eof");
 					dataWriter.newLine();
 	
-					System.out.println("\n*****Process Complete*****");
-	
 					welcomeData.close();
 					dataWriter.close();
 					fileReader.close();
 					dataSocket.close();
 	
-					System.out.println("\nWhat would you like to do next: \nget: file.txt ||  stor: file.txt  || quit\n");
+					System.out.println("\nWhat would you like to do next: \nret: file.txt ||  stor: file.txt  || quit\n");
 				}
-
-
 			}
 
 			else{

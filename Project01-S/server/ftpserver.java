@@ -1,9 +1,6 @@
 import java.io.*; 
 import java.net.*;
 import java.util.*;
-import java.text.*;
-import java.lang.*;
-import javax.swing.*;
 
     public class ftpserver extends Thread{ 
     private Socket connectionSocket;
@@ -37,7 +34,6 @@ import javax.swing.*;
 	{
             String fromClient;
             String clientCommand;
-            byte[] data;
             String frstln;
                     
             while(true)
@@ -137,9 +133,8 @@ import javax.swing.*;
 
              if(clientCommand.equals("stor:")){
                 String filename = fromClient.substring(11);
-                File file = new File(filename);
 
-                System.out.println("***** Storing file: " + filename + " *****");
+                System.out.println("Storing file: " + filename);
 
                 Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
 
